@@ -31,7 +31,6 @@
       align-items: center;
       flex-direction: column;
       gap: 20px;
-      transition: all 0.5s ease;
     }
 
     #stars {
@@ -64,7 +63,7 @@
     <div class="mouth" id="mouth"></div>
   </div>
 
-  <div id="3d-container" style="width: 300px; height: 300px;"></div>
+  <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
 
   <div style="position: absolute; top: 20px; left: 20px; color: white;">
     <h2>Feature Controls</h2>
@@ -76,11 +75,14 @@
     </label><br>
     <label>
       <input type="checkbox" id="toggle-mood" onclick="toggleFeature('face')"> Enable Mood Animations
-    </label>
+    </label><br>
+    <button onclick="startListening()">Activate Voice</button>
   </div>
 
+  <div id="status" style="color: white; position: absolute; bottom: 20px;"></div>
+
   <script>
-    // 3D Cube Initialization
+    // Initialize the 3D Cube
     function init3D() {
       const container = document.getElementById('3d-container');
       const scene = new THREE.Scene();
@@ -109,8 +111,13 @@
     // Toggle Feature Visibility
     function toggleFeature(featureId) {
       const element = document.getElementById(featureId);
-      element.style.display = element.style.display === 'none' ? 'block' : 'none';
-      localStorage.setItem(featureId, element.style.display); // Save state
+      const isVisible = element.style.display === 'none';
+      element.style.display = isVisible ? 'block' : 'none';
+      localStorage.setItem(featureId, element.style.display);
+
+      if (featureId === '3d-container' && isVisible) {
+        init3D(); // Ensure 3D cube initializes on toggle
+      }
     }
 
     // Load Saved Settings on Page Load
@@ -119,8 +126,6 @@
         const savedState = localStorage.getItem(featureId) || 'none';
         document.getElementById(featureId).style.display = savedState;
       });
-
-      init3D(); // Initialize the 3D Cube
     };
   </script>
 </body>
