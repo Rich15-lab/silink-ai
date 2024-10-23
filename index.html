@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SILINK AI</title>
+  <style>
+    body {
+      background-color: #0d0d0d;
+      color: #0ff6f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+    }
+
+    h1 {
+      font-size: 3rem;
+      text-shadow: 0 0 10px #0ff6f6, 0 0 20px #0ff6f6;
+      animation: glow 1.5s ease-in-out infinite alternate;
+    }
+
+    p {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background-color: transparent;
+      color: #0ff6f6;
+      border: 2px solid #0ff6f6;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background-color: #0ff6f6;
+      color: #111;
+      box-shadow: 0 0 10px #0ff6f6, 0 0 40px #0ff6f6;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #0ff6f6, 0 0 20px #0ff6f6;
+      }
+      to {
+        text-shadow: 0 0 20px #0ff6f6, 0 0 30px #0ff6f6;
+      }
+    }
+
+    .typing {
+      border-right: 2px solid #0ff6f6;
+      display: inline-block;
+      width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      animation: typing 2s steps(30, end), blink 0.5s step-end infinite;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>SILINK AI</h1>
+    <p id="status">Press the button and speak.</p>
+    <button onclick="startListening()">Activate Voice</button>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const speech = event.results[0][0].transcript.toLowerCase();
+        status.innerHTML = `You said: "${speech}"`;
+        getMockResponse(speech);
+      };
+
+      recognition.onerror = (event) => {
+        status.innerHTML = `Error: ${event.error}`;
+      };
+    }
+
+    function getMockResponse(prompt) {
+      let response;
+
+      if (prompt.includes('hello')) {
+        response = 'Hello! Welcome to SILINK AI!';
+      } else if (prompt.includes('what is silink')) {
+        response = 'SILINK AI is your futuristic voice-powered platform for societal innovation.';
+      } else if (prompt.includes('tell me a joke')) {
+        response = 'Why did the AI go to therapy? It had too many neural breakdowns!';
+      } else {
+        response = 'Sorry, I did not understand that.';
+      }
+
+      typeResponse(response);
+    }
+
+    function typeResponse(text) {
+      status.innerHTML = '';  // Clear previous text
+      const typingEffect = document.createElement('span');
+      typingEffect.classList.add('typing');
+      typingEffect.textContent = text;
+      status.appendChild(typingEffect);
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
