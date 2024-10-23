@@ -3,16 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SILINK AI</title>
+  <title>SILINK AI - Sci-Fi Mode</title>
 
   <style>
     body {
       margin: 0;
       overflow: hidden;
       height: 100vh;
-      background-color: #000;
+      background-color: black;
       font-family: 'Arial', sans-serif;
-      color: #0ff6f6;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -24,13 +23,18 @@
       width: 250px;
       height: 250px;
       border-radius: 50%;
-      background: rgba(17, 17, 17, 0.8);
-      box-shadow: 0 0 30px #0ff6f6;
+      background: linear-gradient(135deg, rgba(17, 17, 17, 0.8), rgba(0, 255, 255, 0.2));
+      box-shadow: 0 0 40px #0ff6f6, 0 0 80px #0ff6f6;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      gap: 20px;
+      animation: glow 3s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 20px #0ff6f6; }
+      to { box-shadow: 0 0 60px #0ff6f6, 0 0 120px #0ff6f6; }
     }
 
     #stars {
@@ -39,13 +43,28 @@
       height: 200%;
       background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
       background-size: cover;
-      animation: moveStars 30s linear infinite;
+      animation: moveStars 20s linear infinite;
       z-index: -1;
     }
 
     @keyframes moveStars {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      from { transform: translateY(0); }
+      to { transform: translateY(-50%); }
+    }
+
+    .trail {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #0ff6f6;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(2); opacity: 0.5; }
     }
   </style>
 
@@ -53,6 +72,11 @@
 </head>
 
 <body>
+  <audio autoplay loop>
+    <source src="https://www.soundjay.com/ambient/sounds/space-ambience-01.mp3" type="audio/mp3">
+    Your browser does not support the audio element.
+  </audio>
+
   <div id="stars"></div>
 
   <div class="face neutral" id="face">
@@ -63,110 +87,20 @@
     <div class="mouth" id="mouth"></div>
   </div>
 
-  <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
-
-  <div style="position: absolute; top: 20px; left: 20px; color: white;">
-    <h2>Feature Controls</h2>
-    <label>
-      <input type="checkbox" id="toggle-3d" onclick="toggleFeature('3d-container')"> Enable 3D Cube
-    </label><br>
-    <label>
-      <input type="checkbox" id="toggle-stars" onclick="toggleFeature('stars')"> Enable Stars Background
-    </label><br>
-    <label>
-      <input type="checkbox" id="toggle-mood" onclick="toggleFeature('face')"> Enable Mood Animations
-    </label><br>
-    <button onclick="startListening()">Activate Voice</button>
-  </div>
-
-  <div id="status" style="color: white; position: absolute; bottom: 20px;"></div>
+  <div id="3d-container" style="width: 300px; height: 300px;"></div>
 
   <script>
-    function startListening() {
-      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-        alert('Speech recognition is not supported in this browser. Please use Google Chrome.');
-        return;
-      }
-
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.start();
-
-      recognition.onresult = (event) => {
-        const speech = event.results[0][0].transcript.toLowerCase();
-        document.getElementById('status').innerHTML = `You said: "${speech}"`;
-        getMockResponse(speech);
-      };
-
-      recognition.onerror = (event) => {
-        document.getElementById('status').innerHTML = `Error: ${event.error}`;
-      };
-    }
-
-    function getMockResponse(prompt) {
-      let response;
-      let mood = 'neutral';
-
-      if (prompt.includes('hello')) {
-        response = 'Hello! Welcome to SILINK AI!';
-        mood = 'happy';
-      } else if (prompt.includes('what is silink')) {
-        response = 'SILINK AI is your futuristic voice-powered platform.';
-        mood = 'neutral';
-      } else if (prompt.includes('joke')) {
-        response = 'Why did the AI go to therapy? It had too many neural breakdowns!';
-        mood = 'happy';
-      } else {
-        response = 'Sorry, I didn’t catch that.';
-        mood = 'confused';
-      }
-
-      updateMood(mood);
-      typeAndSpeakResponse(response);
-    }
-
-    function updateMood(mood) {
-      const face = document.getElementById('face');
-      face.className = `face ${mood}`;
-    }
-
-    function typeAndSpeakResponse(text) {
-      const status = document.getElementById('status');
-      status.innerHTML = text;
-
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
-    }
-
-    function toggleFeature(featureId) {
-      const element = document.getElementById(featureId);
-      const isVisible = element.style.display === 'none';
-      element.style.display = isVisible ? 'block' : 'none';
-      localStorage.setItem(featureId, element.style.display);
-
-      if (featureId === '3d-container' && isVisible) {
-        init3D();
-      }
-    }
-
-    window.onload = () => {
-      ['3d-container', 'stars', 'face'].forEach((featureId) => {
-        const savedState = localStorage.getItem(featureId) || 'none';
-        document.getElementById(featureId).style.display = savedState;
-      });
-    };
-
+    // Initialize 3D Cube with Glow
     function init3D() {
       const container = document.getElementById('3d-container');
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer();
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
       renderer.setSize(container.clientWidth, container.clientHeight);
       container.appendChild(renderer.domElement);
 
       const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6 });
+      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6, wireframe: true });
       const cube = new THREE.Mesh(geometry, material);
       scene.add(cube);
 
@@ -181,6 +115,20 @@
 
       animate();
     }
+
+    // Mouse-following light trails
+    document.addEventListener('mousemove', (event) => {
+      const trail = document.createElement('div');
+      trail.className = 'trail';
+      trail.style.left = `${event.pageX}px`;
+      trail.style.top = `${event.pageY}px`;
+      document.body.appendChild(trail);
+
+      setTimeout(() => trail.remove(), 500);
+    });
+
+    // Initialize 3D cube on page load
+    window.onload = init3D;
   </script>
 </body>
 </html>
