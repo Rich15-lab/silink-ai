@@ -72,21 +72,6 @@
       from { transform: translateY(0); }
       to { transform: translateY(-50%); }
     }
-
-    .trail {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: #0ff6f6;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(2); opacity: 0.5; }
-    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -171,6 +156,7 @@
     function generateAIResponse(speech) {
       let response = 'I didn’t catch that.';
       if (speech.includes('hello')) response = 'Hello! Welcome to SILINK AI!';
+      else if (speech.includes('joke')) response = 'Why don’t robots ever get tired? They recharge!';
       typeAndSpeakResponse(response);
     }
 
@@ -185,21 +171,6 @@
       element.style.display = element.style.display === 'none' ? 'block' : 'none';
       if (id === '3d-container') init3D();
     }
-
-    document.addEventListener('mousemove', (e) => {
-      const trail = document.createElement('div');
-      trail.className = 'trail';
-      trail.style.left = `${e.pageX}px`;
-      trail.style.top = `${e.pageY}px`;
-      document.body.appendChild(trail);
-      setTimeout(() => trail.remove(), 500);
-    });
-
-    window.onload = () => {
-      ['3d-container', 'stars', 'face'].forEach(id => {
-        document.getElementById(id).style.display = localStorage.getItem(id) || 'none';
-      });
-    };
   </script>
 </body>
 </html>
