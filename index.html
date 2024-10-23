@@ -82,7 +82,81 @@
   <div id="status" style="color: white; position: absolute; bottom: 20px;"></div>
 
   <script>
-    // Initialize the 3D Cube
+    function startListening() {
+      if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+        alert('Speech recognition is not supported in this browser. Please use Google Chrome.');
+        return;
+      }
+
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const speech = event.results[0][0].transcript.toLowerCase();
+        document.getElementById('status').innerHTML = `You said: "${speech}"`;
+        getMockResponse(speech);
+      };
+
+      recognition.onerror = (event) => {
+        document.getElementById('status').innerHTML = `Error: ${event.error}`;
+      };
+    }
+
+    function getMockResponse(prompt) {
+      let response;
+      let mood = 'neutral';
+
+      if (prompt.includes('hello')) {
+        response = 'Hello! Welcome to SILINK AI!';
+        mood = 'happy';
+      } else if (prompt.includes('what is silink')) {
+        response = 'SILINK AI is your futuristic voice-powered platform.';
+        mood = 'neutral';
+      } else if (prompt.includes('joke')) {
+        response = 'Why did the AI go to therapy? It had too many neural breakdowns!';
+        mood = 'happy';
+      } else {
+        response = 'Sorry, I didn’t catch that.';
+        mood = 'confused';
+      }
+
+      updateMood(mood);
+      typeAndSpeakResponse(response);
+    }
+
+    function updateMood(mood) {
+      const face = document.getElementById('face');
+      face.className = `face ${mood}`;
+    }
+
+    function typeAndSpeakResponse(text) {
+      const status = document.getElementById('status');
+      status.innerHTML = text;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function toggleFeature(featureId) {
+      const element = document.getElementById(featureId);
+      const isVisible = element.style.display === 'none';
+      element.style.display = isVisible ? 'block' : 'none';
+      localStorage.setItem(featureId, element.style.display);
+
+      if (featureId === '3d-container' && isVisible) {
+        init3D();
+      }
+    }
+
+    window.onload = () => {
+      ['3d-container', 'stars', 'face'].forEach((featureId) => {
+        const savedState = localStorage.getItem(featureId) || 'none';
+        document.getElementById(featureId).style.display = savedState;
+      });
+    };
+
     function init3D() {
       const container = document.getElementById('3d-container');
       const scene = new THREE.Scene();
@@ -107,26 +181,6 @@
 
       animate();
     }
-
-    // Toggle Feature Visibility
-    function toggleFeature(featureId) {
-      const element = document.getElementById(featureId);
-      const isVisible = element.style.display === 'none';
-      element.style.display = isVisible ? 'block' : 'none';
-      localStorage.setItem(featureId, element.style.display);
-
-      if (featureId === '3d-container' && isVisible) {
-        init3D(); // Ensure 3D cube initializes on toggle
-      }
-    }
-
-    // Load Saved Settings on Page Load
-    window.onload = () => {
-      ['3d-container', 'stars', 'face'].forEach((featureId) => {
-        const savedState = localStorage.getItem(featureId) || 'none';
-        document.getElementById(featureId).style.display = savedState;
-      });
-    };
   </script>
 </body>
 </html>
