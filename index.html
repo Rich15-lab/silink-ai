@@ -48,54 +48,43 @@
     /* Face Container */
     .face {
       position: relative;
-      width: 200px;
-      height: 200px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
       background-color: #111;
       box-shadow: 0 0 30px #0ff6f6, 0 0 60px #0ff6f6;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      gap: 20px;
     }
 
     /* Eyes */
     .eye {
-      width: 20px;
-      height: 20px;
+      width: 30px;
+      height: 30px;
       background-color: #0ff6f6;
       border-radius: 50%;
-      position: absolute;
     }
 
-    .eye.left {
-      left: 50px;
-      top: 70px;
-    }
-
-    .eye.right {
-      right: 50px;
-      top: 70px;
+    .eyes {
+      display: flex;
+      justify-content: space-between;
+      width: 60%;
     }
 
     /* Mouth */
     .mouth {
-      position: absolute;
-      bottom: 50px;
-      width: 80px;
-      height: 10px;
+      width: 100px;
+      height: 20px;
       background-color: #0ff6f6;
-      border-radius: 20px;
-      animation: idleMouth 2s infinite;
+      border-radius: 10px;
+      transition: height 0.2s ease;
     }
 
-    @keyframes idleMouth {
-      0%, 100% { height: 10px; }
-      50% { height: 20px; }
-    }
-
-    @keyframes speakingMouth {
-      0%, 100% { height: 30px; }
-      50% { height: 50px; }
+    .mouth.speaking {
+      height: 50px;
     }
 
     #stars {
@@ -118,8 +107,10 @@
   <div id="stars"></div> <!-- Animated Stars Background -->
 
   <div class="face">
-    <div class="eye left"></div>
-    <div class="eye right"></div>
+    <div class="eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
     <div class="mouth" id="mouth"></div>
   </div>
 
@@ -192,9 +183,9 @@
 
     function animateMouth(isSpeaking) {
       if (isSpeaking) {
-        mouth.style.animation = 'speakingMouth 0.3s infinite';
+        mouth.classList.add('speaking');
       } else {
-        mouth.style.animation = 'idleMouth 2s infinite';
+        mouth.classList.remove('speaking');
       }
     }
   </script>
