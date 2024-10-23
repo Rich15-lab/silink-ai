@@ -86,7 +86,7 @@
   </style>
 </head>
 <body>
-  <div id="stars"></div> <!-- Animated stars background -->
+  <div id="stars"></div>
 
   <div>
     <h1>SILINK AI</h1>
@@ -101,7 +101,6 @@
 
   <script>
     const status = document.getElementById('status');
-    const ambientSound = document.getElementById('ambient');
 
     function startListening() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
