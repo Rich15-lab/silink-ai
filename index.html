@@ -11,51 +11,11 @@
       overflow: hidden;
       height: 100vh;
       background-color: black;
-      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
       gap: 20px;
-    }
-
-    .face {
-      width: 250px;
-      height: 250px;
-      border-radius: 50%;
-      background: rgba(17, 17, 17, 0.8);
-      box-shadow: 0 0 40px #0ff6f6, 0 0 80px #0ff6f6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      animation: glow 3s infinite alternate;
-    }
-
-    .eyes {
-      display: flex;
-      justify-content: space-between;
-      width: 60%;
-    }
-
-    .eye {
-      width: 30px;
-      height: 30px;
-      background-color: #0ff6f6;
-      border-radius: 50%;
-      box-shadow: 0 0 20px #0ff6f6;
-    }
-
-    .mouth {
-      width: 100px;
-      height: 15px;
-      background-color: #0ff6f6;
-      border-radius: 10px;
-    }
-
-    @keyframes glow {
-      from { box-shadow: 0 0 20px #0ff6f6; }
-      to { box-shadow: 0 0 60px #0ff6f6; }
     }
 
     #stars {
@@ -71,6 +31,35 @@
     @keyframes moveStars {
       from { transform: translateY(0); }
       to { transform: translateY(-50%); }
+    }
+
+    .robot-face {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #0ff6f6, #0d7373);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      box-shadow: 0 0 40px #0ff6f6, 0 0 80px #0ff6f6;
+    }
+
+    .robot-eye {
+      width: 50px;
+      height: 50px;
+      background-color: #0d7373;
+      border-radius: 50%;
+      margin: 5px;
+      box-shadow: 0 0 20px #0ff6f6;
+    }
+
+    .robot-mouth {
+      width: 120px;
+      height: 15px;
+      background-color: #0ff6f6;
+      border-radius: 10px;
+      margin-top: 20px;
     }
 
     .trail {
@@ -95,31 +84,17 @@
 <body>
   <div id="stars"></div>
 
-  <div class="face neutral" id="face">
-    <div class="eyes">
-      <div class="eye"></div>
-      <div class="eye"></div>
+  <div class="robot-face" id="face">
+    <div style="display: flex;">
+      <div class="robot-eye"></div>
+      <div class="robot-eye"></div>
     </div>
-    <div class="mouth" id="mouth"></div>
+    <div class="robot-mouth"></div>
   </div>
 
   <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
 
-  <div style="position: absolute; top: 20px; left: 20px; color: white;">
-    <h2>Feature Controls</h2>
-    <label>
-      <input type="checkbox" id="toggle-3d" onclick="toggleFeature('3d-container')"> Enable 3D Cube
-    </label><br>
-    <label>
-      <input type="checkbox" id="toggle-stars" onclick="toggleFeature('stars')"> Enable Stars Background
-    </label><br>
-    <label>
-      <input type="checkbox" id="toggle-mood" onclick="toggleFeature('face')"> Enable Mood Animations
-    </label><br>
-    <button onclick="startListening()">Activate Voice</button>
-  </div>
-
-  <div id="status" style="color: white; position: absolute; bottom: 20px;"></div>
+  <button onclick="startListening()">Activate Voice</button>
 
   <script>
     let cubeSpeed = 0.01;
@@ -164,27 +139,21 @@
       };
 
       recognition.onerror = (event) => {
-        document.getElementById('status').innerHTML = `Error: ${event.error}`;
+        console.error(`Error: ${event.error}`);
       };
     }
 
     function generateAIResponse(speech) {
       let response = 'I didn’t catch that.';
       if (speech.includes('hello')) response = 'Hello! Welcome to SILINK AI!';
-      else if (speech.includes('joke')) response = 'Why did the AI go to therapy? It had too many circuits crossed!';
+      else if (speech.includes('joke')) response = 'Why don’t robots get tired? They recharge!';
       typeAndSpeakResponse(response);
     }
 
     function typeAndSpeakResponse(response) {
-      document.getElementById('status').innerHTML = response;
       const utterance = new SpeechSynthesisUtterance(response);
+      utterance.lang = 'en-US';
       window.speechSynthesis.speak(utterance);
-    }
-
-    function toggleFeature(id) {
-      const element = document.getElementById(id);
-      element.style.display = element.style.display === 'none' ? 'block' : 'none';
-      if (id === '3d-container') init3D();
     }
 
     document.addEventListener('mousemove', (e) => {
@@ -197,9 +166,7 @@
     });
 
     window.onload = () => {
-      ['3d-container', 'stars', 'face'].forEach(id => {
-        document.getElementById(id).style.display = localStorage.getItem(id) || 'none';
-      });
+      init3D();
     };
   </script>
 </body>
