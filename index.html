@@ -11,6 +11,7 @@
       overflow: hidden;
       height: 100vh;
       background-color: black;
+      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -61,28 +62,13 @@
       border-radius: 10px;
       margin-top: 20px;
     }
-
-    .trail {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: #0ff6f6;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(2); opacity: 0.5; }
-    }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 
 <body>
-  <div id="stars"></div>
+  <div id="stars" style="display: none;"></div>
 
   <div class="robot-face" id="face">
     <div style="display: flex;">
@@ -122,10 +108,11 @@
       }
 
       animate();
+    }
 
-      container.addEventListener('click', () => {
-        cubeSpeed += 0.01;
-      });
+    function toggleFeature(feature) {
+      const element = document.getElementById(feature);
+      element.style.display = element.style.display === 'none' ? 'block' : 'none';
     }
 
     function startListening() {
@@ -134,26 +121,37 @@
       recognition.start();
 
       recognition.onresult = (event) => {
-        const userSpeech = event.results[0][0].transcript.toLowerCase();
-        generateAIResponse(userSpeech);
+        const command = event.results[0][0].transcript.toLowerCase();
+        console.log(`Command: ${command}`);
+        handleVoiceCommand(command);
       };
 
       recognition.onerror = (event) => {
         console.error(`Error: ${event.error}`);
       };
+
+      recognition.onend = () => {
+        recognition.start(); // Restart recognition for continuous listening
+      };
     }
 
-    function generateAIResponse(speech) {
-      let response = 'I didn’t catch that.';
-      if (speech.includes('hello')) response = 'Hello! Welcome to SILINK AI!';
-      else if (speech.includes('joke')) response = 'Why don’t robots get tired? They recharge!';
-      typeAndSpeakResponse(response);
-    }
-
-    function typeAndSpeakResponse(response) {
-      const utterance = new SpeechSynthesisUtterance(response);
-      utterance.lang = 'en-US';
-      window.speechSynthesis.speak(utterance);
+    function handleVoiceCommand(command) {
+      if (command.includes('enable stars')) {
+        toggleFeature('stars');
+      } else if (command.includes('disable stars')) {
+        toggleFeature('stars');
+      } else if (command.includes('enable 3d cube')) {
+        init3D();
+        toggleFeature('3d-container');
+      } else if (command.includes('disable 3d cube')) {
+        toggleFeature('3d-container');
+      } else if (command.includes('change mood to happy')) {
+        document.getElementById('face').style.background = 'linear-gradient(145deg, #0ff6f6, #80ffea)';
+      } else if (command.includes('change mood to sad')) {
+        document.getElementById('face').style.background = 'linear-gradient(145deg, #0d7373, #2c3e50)';
+      } else {
+        console.log('Command not recognized.');
+      }
     }
 
     document.addEventListener('mousemove', (e) => {
@@ -166,7 +164,7 @@
     });
 
     window.onload = () => {
-      init3D();
+      console.log('Ready!');
     };
   </script>
 </body>
