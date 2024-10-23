@@ -121,6 +121,7 @@
       typingEffect.classList.add('typing');
       typingEffect.textContent = text;
       status.appendChild(typingEffect);
+      speak(text);  // Speak the response after typing animation
     }
 
     function speak(text) {
