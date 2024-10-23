@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SILINK AI - Integrated Platform</title>
+  <title>SILINK AI - Futuristic Robot Platform</title>
 
   <style>
     body {
@@ -11,11 +11,11 @@
       overflow: hidden;
       height: 100vh;
       background-color: black;
+      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      gap: 20px;
     }
 
     #stars {
@@ -34,32 +34,14 @@
     }
 
     .robot-face {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #0ff6f6, #0d7373);
+      width: 400px;
+      height: 400px;
+      background: url('/mnt/data/A_realistic,_sleek,_futuristic_robot_face_with_glo.png') no-repeat center center;
+      background-size: contain;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
-      box-shadow: 0 0 40px #0ff6f6, 0 0 80px #0ff6f6;
-    }
-
-    .robot-eye {
-      width: 50px;
-      height: 50px;
-      background-color: #0d7373;
-      border-radius: 50%;
-      margin: 5px;
-      box-shadow: 0 0 20px #0ff6f6;
-    }
-
-    .robot-mouth {
-      width: 120px;
-      height: 15px;
-      background-color: #0ff6f6;
-      border-radius: 10px;
-      margin-top: 20px;
+      box-shadow: 0 0 60px #0ff6f6;
     }
 
     .trail {
@@ -77,53 +59,15 @@
       50% { transform: scale(2); opacity: 0.5; }
     }
   </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 
 <body>
-  <div id="stars" style="display: none;"></div>
-
-  <div class="robot-face" id="face">
-    <div style="display: flex;">
-      <div class="robot-eye"></div>
-      <div class="robot-eye"></div>
-    </div>
-    <div class="robot-mouth"></div>
-  </div>
-
-  <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
+  <div id="stars"></div>
+  <div class="robot-face" id="robot-face"></div>
 
   <button onclick="startListening()">Activate Voice</button>
 
   <script>
-    let cubeSpeed = 0.01;
-
-    function init3D() {
-      const container = document.getElementById('3d-container');
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6, wireframe: true });
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-
-      camera.position.z = 5;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        cube.rotation.x += cubeSpeed;
-        cube.rotation.y += cubeSpeed;
-        renderer.render(scene, camera);
-      }
-
-      animate();
-    }
-
     function toggleFeature(feature) {
       const element = document.getElementById(feature);
       element.style.display = element.style.display === 'none' ? 'block' : 'none';
@@ -145,26 +89,23 @@
       };
 
       recognition.onend = () => {
-        recognition.start(); // Restart for continuous listening
+        recognition.start(); // Continuous listening
       };
     }
 
     function handleVoiceCommand(command) {
-      command = command.toLowerCase();
-
       if (command.includes('enable') && command.includes('stars')) {
         toggleFeature('stars');
+        console.log('Stars enabled');
       } else if (command.includes('disable') && command.includes('stars')) {
         toggleFeature('stars');
-      } else if (command.includes('enable') && command.includes('cube')) {
-        init3D();
-        toggleFeature('3d-container');
-      } else if (command.includes('disable') && command.includes('cube')) {
-        toggleFeature('3d-container');
-      } else if (command.includes('mood') && command.includes('happy')) {
-        document.getElementById('face').style.background = 'linear-gradient(145deg, #0ff6f6, #80ffea)';
-      } else if (command.includes('mood') && command.includes('sad')) {
-        document.getElementById('face').style.background = 'linear-gradient(145deg, #0d7373, #2c3e50)';
+        console.log('Stars disabled');
+      } else if (command.includes('show robot')) {
+        toggleFeature('robot-face');
+        console.log('Robot face shown');
+      } else if (command.includes('hide robot')) {
+        toggleFeature('robot-face');
+        console.log('Robot face hidden');
       } else {
         console.log(`Command not recognized: ${command}`);
       }
@@ -180,7 +121,7 @@
     });
 
     window.onload = () => {
-      console.log('Ready!');
+      console.log('Platform Ready');
     };
   </script>
 </body>
