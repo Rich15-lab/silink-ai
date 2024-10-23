@@ -37,6 +37,7 @@
       height: 400px;
       background: url('/mnt/data/A_sleek,_realistic,_futuristic_robot_face_with_glo.png') no-repeat center center;
       background-size: contain;
+      z-index: 1;
       box-shadow: 0 0 60px #0ff6f6;
     }
 
@@ -87,6 +88,7 @@
   <div class="controls">
     <button class="button" onclick="toggleFeature('stars')">Toggle Stars</button>
     <button class="button" onclick="toggleFeature('3d-container')">Toggle 3D Cube</button>
+    <button class="button" onclick="startListening()">Activate Voice</button>
   </div>
 
   <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
@@ -125,6 +127,40 @@
       const element = document.getElementById(feature);
       element.style.display = element.style.display === 'none' ? 'block' : 'none';
       if (feature === '3d-container') init3D();
+    }
+
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase();
+        console.log(`Command: ${command}`);
+        handleVoiceCommand(command);
+      };
+
+      recognition.onerror = (event) => {
+        console.error(`Error: ${event.error}`);
+      };
+
+      recognition.onend = () => {
+        recognition.start(); // Restart for continuous listening
+      };
+    }
+
+    function handleVoiceCommand(command) {
+      if (command.includes('enable') && command.includes('stars')) {
+        toggleFeature('stars');
+      } else if (command.includes('disable') && command.includes('stars')) {
+        toggleFeature('stars');
+      } else if (command.includes('enable') && command.includes('cube')) {
+        toggleFeature('3d-container');
+      } else if (command.includes('disable') && command.includes('cube')) {
+        toggleFeature('3d-container');
+      } else {
+        console.log(`Command not recognized: ${command}`);
+      }
     }
 
     document.addEventListener('mousemove', (e) => {
