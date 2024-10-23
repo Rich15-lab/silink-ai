@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SILINK AI - Sci-Fi Platform</title>
+  <title>SILINK AI - Integrated Platform</title>
 
   <style>
     body {
@@ -11,7 +11,6 @@
       overflow: hidden;
       height: 100vh;
       background-color: black;
-      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -61,6 +60,21 @@
       background-color: #0ff6f6;
       border-radius: 10px;
       margin-top: 20px;
+    }
+
+    .trail {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #0ff6f6;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(2); opacity: 0.5; }
     }
   </style>
 
@@ -131,26 +145,28 @@
       };
 
       recognition.onend = () => {
-        recognition.start(); // Restart recognition for continuous listening
+        recognition.start(); // Restart for continuous listening
       };
     }
 
     function handleVoiceCommand(command) {
-      if (command.includes('enable stars')) {
+      command = command.toLowerCase();
+
+      if (command.includes('enable') && command.includes('stars')) {
         toggleFeature('stars');
-      } else if (command.includes('disable stars')) {
+      } else if (command.includes('disable') && command.includes('stars')) {
         toggleFeature('stars');
-      } else if (command.includes('enable 3d cube')) {
+      } else if (command.includes('enable') && command.includes('cube')) {
         init3D();
         toggleFeature('3d-container');
-      } else if (command.includes('disable 3d cube')) {
+      } else if (command.includes('disable') && command.includes('cube')) {
         toggleFeature('3d-container');
-      } else if (command.includes('change mood to happy')) {
+      } else if (command.includes('mood') && command.includes('happy')) {
         document.getElementById('face').style.background = 'linear-gradient(145deg, #0ff6f6, #80ffea)';
-      } else if (command.includes('change mood to sad')) {
+      } else if (command.includes('mood') && command.includes('sad')) {
         document.getElementById('face').style.background = 'linear-gradient(145deg, #0d7373, #2c3e50)';
       } else {
-        console.log('Command not recognized.');
+        console.log(`Command not recognized: ${command}`);
       }
     }
 
