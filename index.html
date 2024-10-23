@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SILINK AI</title>
   <style>
-    /* Base Styles for Face and Elements */
     body {
       margin: 0;
       overflow: hidden;
@@ -88,24 +87,38 @@
       transform: rotate(180deg);
     }
 
-    .neutral .eye {
-      width: 30px;
-      height: 30px;
+    /* Moving Stars Background */
+    #stars {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+      background-size: cover;
+      animation: moveStars 30s linear infinite;
+      z-index: -1;
     }
 
-    .neutral .mouth {
-      width: 100px;
-      height: 15px;
+    @keyframes moveStars {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
     }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-  <div class="face neutral" id="face">
-    <div class="eyes">
-      <div class="eye"></div>
-      <div class="eye"></div>
+  <div id="stars"></div>
+
+  <div style="display: flex; gap: 50px;">
+    <div class="face neutral" id="face">
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
+      <div class="mouth" id="mouth"></div>
     </div>
-    <div class="mouth" id="mouth"></div>
+
+    <div id="3d-container" style="width: 300px; height: 300px;"></div>
   </div>
 
   <div>
@@ -115,6 +128,31 @@
   </div>
 
   <script>
+    function init3D() {
+      const container = document.getElementById('3d-container');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+
     function startListening() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
@@ -133,12 +171,12 @@
 
     function updateMood(mood) {
       const face = document.getElementById('face');
-      face.className = `face ${mood}`; // Apply the mood class to the face
+      face.className = `face ${mood}`; // Apply the mood class
     }
 
     function getMockResponse(prompt) {
       let response;
-      let mood = 'neutral'; // Default mood
+      let mood = 'neutral';
 
       if (prompt.includes('hello')) {
         response = 'Hello! Welcome to SILINK AI!';
@@ -157,13 +195,13 @@
         mood = 'confused';
       }
 
-      updateMood(mood); // Change the mood
+      updateMood(mood);
       typeAndSpeakResponse(response);
     }
 
     function typeAndSpeakResponse(text) {
       const status = document.getElementById('status');
-      status.innerHTML = ''; // Clear previous text
+      status.innerHTML = '';
 
       const typingEffect = document.createElement('span');
       typingEffect.textContent = text;
@@ -177,6 +215,8 @@
       utterance.lang = 'en-US';
       window.speechSynthesis.speak(utterance);
     }
+
+    window.onload = init3D;
   </script>
 </body>
 </html>
