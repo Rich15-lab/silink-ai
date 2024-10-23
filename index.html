@@ -11,7 +11,6 @@
       overflow: hidden;
       height: 100vh;
       background-color: black;
-      font-family: 'Arial', sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -36,11 +35,8 @@
     .robot-face {
       width: 400px;
       height: 400px;
-      background: url('/mnt/data/A_realistic,_sleek,_futuristic_robot_face_with_glo.png') no-repeat center center;
+      background: url('/mnt/data/A_sleek,_realistic,_futuristic_robot_face_with_glo.png') no-repeat center center;
       background-size: contain;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       box-shadow: 0 0 60px #0ff6f6;
     }
 
@@ -58,6 +54,29 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(2); opacity: 0.5; }
     }
+
+    .controls {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      background-color: #0ff6f6;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: black;
+      font-size: 16px;
+    }
+
+    .button:hover {
+      background-color: #0d7373;
+    }
   </style>
 </head>
 
@@ -65,50 +84,47 @@
   <div id="stars"></div>
   <div class="robot-face" id="robot-face"></div>
 
-  <button onclick="startListening()">Activate Voice</button>
+  <div class="controls">
+    <button class="button" onclick="toggleFeature('stars')">Toggle Stars</button>
+    <button class="button" onclick="toggleFeature('3d-container')">Toggle 3D Cube</button>
+  </div>
+
+  <div id="3d-container" style="width: 300px; height: 300px; display: none;"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
   <script>
+    let cubeSpeed = 0.01;
+
+    function init3D() {
+      const container = document.getElementById('3d-container');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6, wireframe: true });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += cubeSpeed;
+        cube.rotation.y += cubeSpeed;
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+
     function toggleFeature(feature) {
       const element = document.getElementById(feature);
       element.style.display = element.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function startListening() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.start();
-
-      recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase();
-        console.log(`Command: ${command}`);
-        handleVoiceCommand(command);
-      };
-
-      recognition.onerror = (event) => {
-        console.error(`Error: ${event.error}`);
-      };
-
-      recognition.onend = () => {
-        recognition.start(); // Continuous listening
-      };
-    }
-
-    function handleVoiceCommand(command) {
-      if (command.includes('enable') && command.includes('stars')) {
-        toggleFeature('stars');
-        console.log('Stars enabled');
-      } else if (command.includes('disable') && command.includes('stars')) {
-        toggleFeature('stars');
-        console.log('Stars disabled');
-      } else if (command.includes('show robot')) {
-        toggleFeature('robot-face');
-        console.log('Robot face shown');
-      } else if (command.includes('hide robot')) {
-        toggleFeature('robot-face');
-        console.log('Robot face hidden');
-      } else {
-        console.log(`Command not recognized: ${command}`);
-      }
+      if (feature === '3d-container') init3D();
     }
 
     document.addEventListener('mousemove', (e) => {
