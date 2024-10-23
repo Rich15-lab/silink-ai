@@ -45,27 +45,37 @@
       to { text-shadow: 0 0 30px #0ff6f6, 0 0 50px #0ff6f6; }
     }
 
-    /* Face Container */
+    /* Face Container with Hologram Effect */
     .face {
       position: relative;
       width: 250px;
       height: 250px;
       border-radius: 50%;
-      background-color: #111;
+      background-color: rgba(17, 17, 17, 0.8);
       box-shadow: 0 0 30px #0ff6f6, 0 0 60px #0ff6f6;
       display: flex;
       justify-content: center;
       align-items: center;
       flex-direction: column;
       gap: 20px;
+      overflow: hidden;
+      animation: hologram 2s infinite alternate;
     }
 
-    /* Eyes */
+    @keyframes hologram {
+      0% { transform: scale(1) translateY(0); filter: hue-rotate(0deg); }
+      50% { transform: scale(1.05) translateY(-5px); filter: hue-rotate(45deg); }
+      100% { transform: scale(1) translateY(0); filter: hue-rotate(0deg); }
+    }
+
+    /* Eyes with Light Trails */
     .eye {
       width: 30px;
       height: 30px;
       background-color: #0ff6f6;
       border-radius: 50%;
+      box-shadow: 0 0 15px #0ff6f6;
+      animation: trail 1.5s infinite alternate;
     }
 
     .eyes {
@@ -74,17 +84,33 @@
       width: 60%;
     }
 
-    /* Mouth */
+    @keyframes trail {
+      from { box-shadow: 0 0 15px #0ff6f6; }
+      to { box-shadow: 0 0 30px #0ff6f6, 0 0 60px #0ff6f6; }
+    }
+
+    /* Mouth with Pulsating Effect */
     .mouth {
       width: 100px;
       height: 20px;
       background-color: #0ff6f6;
       border-radius: 10px;
       transition: height 0.2s ease;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scaleY(1); }
+      to { transform: scaleY(1.5); }
     }
 
     .mouth.speaking {
-      height: 50px;
+      animation: pulse-speaking 0.3s infinite;
+    }
+
+    @keyframes pulse-speaking {
+      from { transform: scaleY(1); }
+      to { transform: scaleY(2); }
     }
 
     #stars {
