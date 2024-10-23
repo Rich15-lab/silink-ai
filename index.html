@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SILINK AI</title>
+
   <style>
     body {
       margin: 0;
@@ -15,6 +16,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+      gap: 20px;
     }
 
     .face {
@@ -49,6 +52,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
   <div id="stars"></div>
 
@@ -62,22 +66,62 @@
 
   <div id="3d-container" style="width: 300px; height: 300px;"></div>
 
-  <script src="3d-cube.js"></script>
+  <div style="position: absolute; top: 20px; left: 20px; color: white;">
+    <h2>Feature Controls</h2>
+    <label>
+      <input type="checkbox" id="toggle-3d" onclick="toggleFeature('3d-container')"> Enable 3D Cube
+    </label><br>
+    <label>
+      <input type="checkbox" id="toggle-stars" onclick="toggleFeature('stars')"> Enable Stars Background
+    </label><br>
+    <label>
+      <input type="checkbox" id="toggle-mood" onclick="toggleFeature('face')"> Enable Mood Animations
+    </label>
+  </div>
+
   <script>
+    // 3D Cube Initialization
+    function init3D() {
+      const container = document.getElementById('3d-container');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    }
+
+    // Toggle Feature Visibility
+    function toggleFeature(featureId) {
+      const element = document.getElementById(featureId);
+      element.style.display = element.style.display === 'none' ? 'block' : 'none';
+      localStorage.setItem(featureId, element.style.display); // Save state
+    }
+
+    // Load Saved Settings on Page Load
     window.onload = () => {
       ['3d-container', 'stars', 'face'].forEach((featureId) => {
         const savedState = localStorage.getItem(featureId) || 'none';
         document.getElementById(featureId).style.display = savedState;
       });
 
-      init3D(); // Initialize 3D cube
+      init3D(); // Initialize the 3D Cube
     };
-
-    function toggleFeature(featureId) {
-      const element = document.getElementById(featureId);
-      element.style.display = element.style.display === 'none' ? 'block' : 'none';
-      localStorage.setItem(featureId, element.style.display); // Save state
-    }
   </script>
 </body>
 </html>
