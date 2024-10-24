@@ -86,10 +86,15 @@
   <div class="robot-face" id="robot-face"></div>
 
   <div class="controls">
-    <button class="button" onclick="startListening()">Activate Voice</button>
+    <button class="button" onclick="activateFeatures()">Enable All Features</button>
   </div>
 
   <script>
+    function activateFeatures() {
+      startListening();
+      console.log("All features enabled!");
+    }
+
     function startListening() {
       const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
@@ -106,24 +111,28 @@
       };
 
       recognition.onend = () => {
-        recognition.start(); // Restart for continuous listening
+        recognition.start(); // Continuous listening
       };
     }
 
     function respondToCommand(command) {
-      const response = document.createElement('p');
-      response.textContent = `Robot: ${getRobotResponse(command)}`;
-      document.body.appendChild(response);
+      const message = getRobotResponse(command);
+      speak(message);
     }
 
     function getRobotResponse(command) {
       if (command.includes('hello')) {
         return 'Hello! How can I assist you today?';
       } else if (command.includes('how are you')) {
-        return 'I am just a robot, but I am functioning perfectly!';
+        return 'I am functioning perfectly, thank you!';
       } else {
         return 'Sorry, I did not understand that.';
       }
+    }
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utterance);
     }
 
     document.addEventListener('mousemove', (e) => {
