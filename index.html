@@ -33,30 +33,12 @@
     }
 
     .robot-face {
-      position: relative;
       width: 400px;
       height: 400px;
       background: url('https://github.com/Rich15-lab/silink-ai/blob/main/Robot%20Face.jpg?raw=true') no-repeat center center;
       background-size: contain;
-      transition: filter 0.5s, box-shadow 0.5s;
-    }
-
-    .eye {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      top: 120px;
-      background-color: blue;
-      transition: background-color 0.5s;
-    }
-
-    .eye.left {
-      left: 110px;
-    }
-
-    .eye.right {
-      right: 110px;
+      z-index: 1;
+      box-shadow: 0 0 60px #0ff6f6;
     }
 
     .controls {
@@ -81,15 +63,27 @@
     .button:hover {
       background-color: #0d7373;
     }
+
+    .trail {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #0ff6f6;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(2); opacity: 0.5; }
+    }
   </style>
 </head>
 
 <body>
   <div id="stars"></div>
-  <div class="robot-face" id="robot-face">
-    <div class="eye left" id="left-eye"></div>
-    <div class="eye right" id="right-eye"></div>
-  </div>
+  <div class="robot-face" id="robot-face"></div>
 
   <div class="controls">
     <button class="button" onclick="startListening()">Activate Voice</button>
@@ -104,7 +98,7 @@
       recognition.onresult = (event) => {
         const command = event.results[0][0].transcript.toLowerCase();
         console.log(`Command: ${command}`);
-        handleVoiceCommand(command);
+        respondToCommand(command);
       };
 
       recognition.onerror = (event) => {
@@ -112,34 +106,34 @@
       };
 
       recognition.onend = () => {
-        recognition.start(); // Continuous listening
+        recognition.start(); // Restart for continuous listening
       };
     }
 
-    function handleVoiceCommand(command) {
-      if (command.includes('happy')) {
-        setRobotMood('happy');
-      } else if (command.includes('sad')) {
-        setRobotMood('sad');
+    function respondToCommand(command) {
+      const response = document.createElement('p');
+      response.textContent = `Robot: ${getRobotResponse(command)}`;
+      document.body.appendChild(response);
+    }
+
+    function getRobotResponse(command) {
+      if (command.includes('hello')) {
+        return 'Hello! How can I assist you today?';
+      } else if (command.includes('how are you')) {
+        return 'I am just a robot, but I am functioning perfectly!';
       } else {
-        console.log(`Command not recognized: ${command}`);
+        return 'Sorry, I did not understand that.';
       }
     }
 
-    function setRobotMood(mood) {
-      const leftEye = document.getElementById('left-eye');
-      const rightEye = document.getElementById('right-eye');
-
-      if (mood === 'happy') {
-        leftEye.style.backgroundColor = 'blue';
-        rightEye.style.backgroundColor = 'blue';
-        console.log('Mood set to happy');
-      } else if (mood === 'sad') {
-        leftEye.style.backgroundColor = 'red';
-        rightEye.style.backgroundColor = 'red';
-        console.log('Mood set to sad');
-      }
-    }
+    document.addEventListener('mousemove', (e) => {
+      const trail = document.createElement('div');
+      trail.className = 'trail';
+      trail.style.left = `${e.pageX}px`;
+      trail.style.top = `${e.pageY}px`;
+      document.body.appendChild(trail);
+      setTimeout(() => trail.remove(), 500);
+    });
 
     window.onload = () => {
       console.log('Platform Ready');
