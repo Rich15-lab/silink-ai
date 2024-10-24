@@ -33,12 +33,30 @@
     }
 
     .robot-face {
+      position: relative;
       width: 400px;
       height: 400px;
       background: url('https://github.com/Rich15-lab/silink-ai/blob/main/Robot%20Face.jpg?raw=true') no-repeat center center;
       background-size: contain;
       transition: filter 0.5s, box-shadow 0.5s;
-      box-shadow: 0 0 60px #0ff6f6;
+    }
+
+    .eye {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      top: 120px;
+      background-color: blue;
+      transition: background-color 0.5s;
+    }
+
+    .eye.left {
+      left: 110px;
+    }
+
+    .eye.right {
+      right: 110px;
     }
 
     .controls {
@@ -68,7 +86,10 @@
 
 <body>
   <div id="stars"></div>
-  <div class="robot-face" id="robot-face"></div>
+  <div class="robot-face" id="robot-face">
+    <div class="eye left" id="left-eye"></div>
+    <div class="eye right" id="right-eye"></div>
+  </div>
 
   <div class="controls">
     <button class="button" onclick="startListening()">Activate Voice</button>
@@ -91,7 +112,7 @@
       };
 
       recognition.onend = () => {
-        recognition.start(); // Restart recognition continuously
+        recognition.start(); // Continuous listening
       };
     }
 
@@ -106,15 +127,23 @@
     }
 
     function setRobotMood(mood) {
-      const robotFace = document.getElementById('robot-face');
+      const leftEye = document.getElementById('left-eye');
+      const rightEye = document.getElementById('right-eye');
+
       if (mood === 'happy') {
-        robotFace.style.filter = 'brightness(1.5)';
-        robotFace.style.boxShadow = '0 0 80px #0ff6f6, 0 0 120px #80ffea';
+        leftEye.style.backgroundColor = 'blue';
+        rightEye.style.backgroundColor = 'blue';
+        console.log('Mood set to happy');
       } else if (mood === 'sad') {
-        robotFace.style.filter = 'brightness(0.5)';
-        robotFace.style.boxShadow = '0 0 80px red, 0 0 120px darkred';
+        leftEye.style.backgroundColor = 'red';
+        rightEye.style.backgroundColor = 'red';
+        console.log('Mood set to sad');
       }
     }
+
+    window.onload = () => {
+      console.log('Platform Ready');
+    };
   </script>
 </body>
 </html>
