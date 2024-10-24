@@ -85,14 +85,36 @@
   <div class="robot-face" id="robot-face"></div>
 
   <div class="controls">
-    <button class="button" onclick="activateAll()">Enable Features</button>
+    <button class="button" onclick="toggleFeature('stars')">Toggle Stars</button>
+    <button class="button" onclick="toggleFeature('speech')">Toggle Speech Recognition</button>
+    <button class="button" onclick="toggleFeature('trail')">Toggle Mouse Trail</button>
+    <button class="button" onclick="toggleFeature('3d')">Toggle 3D Cube</button>
   </div>
 
+  <div id="3d-container" style="display: none; width: 300px; height: 300px;"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <script>
-    function activateAll() {
-      console.log("All features enabled!");
-      startListening(); // Start voice recognition
-      activateMouseTrail(); // Enable mouse trail effect
+    function toggleFeature(feature) {
+      switch (feature) {
+        case 'stars':
+          const stars = document.getElementById('stars');
+          stars.style.display = stars.style.display === 'none' ? 'block' : 'none';
+          break;
+
+        case 'speech':
+          startListening();
+          break;
+
+        case 'trail':
+          activateMouseTrail();
+          break;
+
+        case '3d':
+          toggle3D();
+          break;
+      }
     }
 
     function startListening() {
@@ -144,6 +166,33 @@
         document.body.appendChild(trail);
         setTimeout(() => trail.remove(), 500);
       });
+    }
+
+    function toggle3D() {
+      const container = document.getElementById('3d-container');
+      container.style.display = container.style.display === 'none' ? 'block' : 'none';
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      const geometry = new THREE.BoxGeometry();
+      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6, wireframe: true });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+
+      animate();
     }
 
     window.onload = () => {
