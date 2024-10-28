@@ -36,12 +36,14 @@
       try {
         const response = await fetch('https://nameless-limit-c46c.grich-medor.workers.dev/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt: input })
+          headers: { 
+            'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({ prompt: input })  // Correct JSON request body
         });
 
         if (!response.ok) {
-          throw new Error('Failed to get a valid response');
+          throw new Error(`Error: ${response.statusText}`);
         }
 
         const result = await response.text();
