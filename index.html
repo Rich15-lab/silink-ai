@@ -3,201 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SILINK AI - Robot Interaction</title>
-
+  <title>SILINK AI Chat</title>
   <style>
     body {
-      margin: 0;
-      overflow: hidden;
-      height: 100vh;
+      font-family: Arial, sans-serif;
       background-color: black;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+      color: white;
+      text-align: center;
+      padding: 50px;
     }
-
-    #stars {
-      position: absolute;
-      width: 200%;
-      height: 200%;
-      background: url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
-      background-size: cover;
-      animation: moveStars 20s linear infinite;
-      z-index: -1;
-    }
-
-    @keyframes moveStars {
-      from { transform: translateY(0); }
-      to { transform: translateY(-50%); }
-    }
-
-    .robot-face {
-      width: 400px;
-      height: 400px;
-      background: url('https://github.com/Rich15-lab/silink-ai/blob/main/Robot%20Face.jpg?raw=true') no-repeat center center;
-      background-size: contain;
-      box-shadow: 0 0 60px #0ff6f6;
-    }
-
-    .controls {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .button {
-      padding: 10px 20px;
-      background-color: #0ff6f6;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      color: black;
+    input, button {
+      margin: 10px;
+      padding: 10px;
       font-size: 16px;
     }
-
-    .button:hover {
-      background-color: #0d7373;
-    }
-
-    .trail {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background-color: #0ff6f6;
-      border-radius: 50%;
-      pointer-events: none;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(2); opacity: 0.5; }
+    #response {
+      margin-top: 20px;
+      white-space: pre-wrap;
     }
   </style>
 </head>
-
 <body>
-  <div id="stars"></div>
-  <div class="robot-face" id="robot-face"></div>
-
-  <div class="controls">
-    <button class="button" onclick="toggleFeature('stars')">Toggle Stars</button>
-    <button class="button" onclick="toggleFeature('speech')">Toggle Speech Recognition</button>
-    <button class="button" onclick="toggleFeature('trail')">Toggle Mouse Trail</button>
-    <button class="button" onclick="toggleFeature('3d')">Toggle 3D Cube</button>
-  </div>
-
-  <div id="3d-container" style="display: none; width: 300px; height: 300px;"></div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <h1>Welcome to SILINK AI</h1>
+  <input type="text" id="userInput" placeholder="Ask me anything..." />
+  <button onclick="sendPrompt()">Send</button>
+  <div id="response">AI Response will appear here...</div>
 
   <script>
-    function toggleFeature(feature) {
-      switch (feature) {
-        case 'stars':
-          const stars = document.getElementById('stars');
-          stars.style.display = stars.style.display === 'none' ? 'block' : 'none';
-          break;
+    async function sendPrompt() {
+      const input = document.getElementById('userInput').value;
 
-        case 'speech':
-          startListening();
-          break;
+      try {
+        const response = await fetch('https://nameless-limit-c46c.grich-medor.workers.dev/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: input })
+        });
 
-        case 'trail':
-          activateMouseTrail();
-          break;
+        if (!response.ok) {
+          throw new Error('Failed to get a valid response');
+        }
 
-        case '3d':
-          toggle3D();
-          break;
+        const result = await response.text();
+        document.getElementById('response').textContent = result;
+      } catch (error) {
+        document.getElementById('response').textContent = `Error: ${error.message}`;
       }
     }
-
-    function startListening() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = 'en-US';
-      recognition.start();
-
-      recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase();
-        console.log(`Command: ${command}`);
-        respondToCommand(command);
-      };
-
-      recognition.onerror = (event) => {
-        console.error(`Error: ${event.error}`);
-      };
-
-      recognition.onend = () => {
-        recognition.start(); // Keep listening continuously
-      };
-    }
-
-    function respondToCommand(command) {
-      const message = getRobotResponse(command);
-      speak(message);
-    }
-
-    function getRobotResponse(command) {
-      if (command.includes('hello')) {
-        return 'Hello! How can I assist you today?';
-      } else if (command.includes('how are you')) {
-        return 'I am functioning perfectly, thank you!';
-      } else {
-        return 'Sorry, I didn’t understand that.';
-      }
-    }
-
-    function speak(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      window.speechSynthesis.speak(utterance);
-    }
-
-    function activateMouseTrail() {
-      document.addEventListener('mousemove', (e) => {
-        const trail = document.createElement('div');
-        trail.className = 'trail';
-        trail.style.left = `${e.pageX}px`;
-        trail.style.top = `${e.pageY}px`;
-        document.body.appendChild(trail);
-        setTimeout(() => trail.remove(), 500);
-      });
-    }
-
-    function toggle3D() {
-      const container = document.getElementById('3d-container');
-      container.style.display = container.style.display === 'none' ? 'block' : 'none';
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ alpha: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      const geometry = new THREE.BoxGeometry();
-      const material = new THREE.MeshBasicMaterial({ color: 0x0ff6f6, wireframe: true });
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-
-      camera.position.z = 5;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-        renderer.render(scene, camera);
-      }
-
-      animate();
-    }
-
-    window.onload = () => {
-      console.log('Platform Ready');
-    };
   </script>
 </body>
 </html>
